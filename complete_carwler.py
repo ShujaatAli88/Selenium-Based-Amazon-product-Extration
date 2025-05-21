@@ -8,6 +8,10 @@ from uuid import uuid4
 from models import ValidateData
 from airtable_manager import AirTableManager
 import time
+import tempfile
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+
 
 class AmazonCrawler:
     def __init__(self):
@@ -17,6 +21,13 @@ class AmazonCrawler:
     def get_driver(self):
         print("Setting Up The Selenium Driver.")
         options = Options()
+        # Set headless and other required flags
+        options.add_argument("--headless=new")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        # ✅ Create a unique temp user-data-dir to avoid conflicts
+        temp_dir = tempfile.mkdtemp()
+        options.add_argument(f"--user-data-dir={temp_dir}")
         options.add_argument("--disable-blink-features=AutomationControlled")
         self.driver = webdriver.Chrome(options=options)
         self.driver.execute_cdp_cmd("Network.enable", {})
