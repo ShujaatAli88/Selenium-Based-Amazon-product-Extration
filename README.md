@@ -21,7 +21,12 @@ This setup ensures compatibility between Chrome and ChromeDriver inside a contai
 ## 📁 Project Structure
 
 ```
-.
+├── gitignore
+├── constants.py
+├── airtable_manager.py
+├── config.py
+├── models.py
+├── dockerignore
 ├── Dockerfile
 ├── requirements.txt
 ├── main.py
@@ -35,14 +40,14 @@ This setup ensures compatibility between Chrome and ChromeDriver inside a contai
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/selenium-docker-chrome.git
-cd selenium-docker-chrome
+git clone https://github.com/ShujaatAli88/Selenium-Based-Amazon-product-Extration.git
+cd Selenium-Based-Amazon-product-Extration
 ```
 
 ### 2. Build the Docker Image
 
 ```bash
-docker build -t selenium-chrome-app .
+docker build -t selenium-chrome-app:latest .
 ```
 
 ### 3. Run the Container
@@ -76,6 +81,10 @@ driver.quit()
 ## 🧾 requirements.txt
 
 ```txt
+requests
+pydantic
+pyairtable
+python-dotenv
 selenium
 ```
 

@@ -8,7 +8,7 @@ from uuid import uuid4
 from models import ValidateData
 from airtable_manager import AirTableManager
 import time
-import tempfile
+import tempfile, shutil, os
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
@@ -20,17 +20,27 @@ class AmazonCrawler:
 
     def get_driver(self):
         print("Setting Up The Selenium Driver.")
+        
+        # Create a truly unique temp directory
+        self.temp_dir = tempfile.mkdtemp(prefix="selenium-profile-")
+
         options = Options()
-        # Set headless and other required flags
-        options.add_argument("--headless=new")
+        options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36")
+        options.add_argument(f"--user-data-dir={self.temp_dir}")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
-        # ✅ Create a unique temp user-data-dir to avoid conflicts
-        temp_dir = tempfile.mkdtemp()
-        options.add_argument(f"--user-data-dir={temp_dir}")
         options.add_argument("--disable-blink-features=AutomationControlled")
-        self.driver = webdriver.Chrome(options=options)
-        self.driver.execute_cdp_cmd("Network.enable", {})
+        options.add_argument("--disable-extensions")
+        options.add_argument("--headless")  # Add this if you're on Linux server or Docker
+
+        try:
+            self.driver = webdriver.Chrome(options=options)
+            self.driver.execute_cdp_cmd("Network.enable", {})
+        except Exception as e:
+            print(f"[FATAL ERROR] Could not launch browser: {e}")
+            # Clean up temp folder if Chrome fails to launch
+            shutil.rmtree(self.temp_dir, ignore_errors=True)
+            raise
 
     def set_cookies(self):
         print("Setting The Cookies.")
@@ -67,7 +77,7 @@ class AmazonCrawler:
                 By.XPATH, "//input[contains(@id,'twotabsearchtextbox')]"
             )
             search_button = self.driver.find_element(
-                By.XPATH, "//input[contains(@id,'nav-search-submit-button')]"
+                By.Xpath, "//input[contains(@id,'nav-search-submit-button')]"
             )
 
             if search_field and search_button:
