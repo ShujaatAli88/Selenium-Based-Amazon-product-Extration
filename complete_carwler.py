@@ -11,6 +11,7 @@ import time
 import tempfile, shutil, os
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 
 
 class AmazonCrawler:
@@ -19,28 +20,14 @@ class AmazonCrawler:
         self.airtable_obj = AirTableManager()
 
     def get_driver(self):
-        print("Setting Up The Selenium Driver.")
-        
-        # Create a truly unique temp directory
-        self.temp_dir = tempfile.mkdtemp(prefix="selenium-profile-")
-
         options = Options()
-        options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36")
-        options.add_argument(f"--user-data-dir={self.temp_dir}")
+        options.add_argument("--headless=new")  # or "--headless"
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
-        options.add_argument("--disable-blink-features=AutomationControlled")
-        options.add_argument("--disable-extensions")
-        options.add_argument("--headless")  # Add this if you're on Linux server or Docker
+        options.binary_location = "/usr/bin/chromium"  # Chrome browser binary
 
-        try:
-            self.driver = webdriver.Chrome(options=options)
-            self.driver.execute_cdp_cmd("Network.enable", {})
-        except Exception as e:
-            print(f"[FATAL ERROR] Could not launch browser: {e}")
-            # Clean up temp folder if Chrome fails to launch
-            shutil.rmtree(self.temp_dir, ignore_errors=True)
-            raise
+        service = Service("/usr/bin/chromedriver")  # ChromeDriver binary
+        self.driver = webdriver.Chrome(service=service, options=options)
 
     def set_cookies(self):
         print("Setting The Cookies.")
@@ -77,7 +64,7 @@ class AmazonCrawler:
                 By.XPATH, "//input[contains(@id,'twotabsearchtextbox')]"
             )
             search_button = self.driver.find_element(
-                By.Xpath, "//input[contains(@id,'nav-search-submit-button')]"
+                By.XPATH, "//input[contains(@id,'nav-search-submit-button')]"
             )
 
             if search_field and search_button:
