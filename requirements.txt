@@ -3,3 +3,4 @@ pydantic
 pyairtable
 python-dotenv
 selenium
+loguru
